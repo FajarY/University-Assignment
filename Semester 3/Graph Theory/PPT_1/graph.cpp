@@ -12,7 +12,7 @@ class djikstraComparer
     }
 };
 
-//All Algorithm Cannot Work With A Negative Cycle
+//All algorithm cannot work with negative cycle
 class graph
 {
     private:
@@ -56,6 +56,8 @@ class graph
 
         edgeCount++;
     }
+
+    //Shortest path algorithm from start to end, cannot work with negative weights
     template <typename comparer>
     int djikstra(int start, int end, vector<int>& returnPath)
     {
@@ -121,7 +123,7 @@ class graph
         return -1;
     }
 
-    //Cannot work with negative cycles (A path that starts and ends at the same vertex)
+    //Algorithm to check the cost from start to every vertex. Also modified to add traversal from start to end or any vertex
     int bellmanFord(int start, int end, vector<int>& returnPath)
     {
         //Left is from vertex to itself, Right is total cost from the vertex to the vertex itself
@@ -194,7 +196,7 @@ class graph
         return cost[end].second;
     }
 
-    //Algorithm for each vertex to other vertex
+    //Algorithm to check the cost of every vertex to every vertex. Also modified to add traversal from every vertex to any vertex
     int floydWarshall(int start, int end, vector<int>& returnPath)
     {
         //Prepare matrix and set to max
@@ -258,9 +260,10 @@ class graph
         return cost[start][end];
     }
 
+    //Same like Floyd  Warshall, instead combine bellman with djikstra. This generates a more efficient time complexity
     int johnson(int start, int end, vector<int>& returnPath)
     {
-        //Belman with extra source vertex
+        //Belman with extra source vertex, with source vertex is directed to every vertex
         vector<int> bellmanVertex = vector<int>(listSize, INT_MAX);
         bellmanVertex[0] = 0;
         
@@ -300,7 +303,8 @@ class graph
             }
         }
 
-        //Create modified edges
+        //Create modified edges for djikstra without the source vertex
+        //Modified edges weight is the original cost plus the (cost from source to vertex start) minus (cost from source to vertex destination)
         vector<vector<pair<int, int>>> modifiedEdges = vector<vector<pair<int, int>>>(listSize);
         for(int i = 1; i <= vertexCount; i++)
         {
@@ -311,6 +315,7 @@ class graph
             }
         }
 
+        //Create cost matrix for traversal and cost purposes
         vector<vector<pair<int, int>>> cost = vector<vector<pair<int, int>>>(listSize, vector<pair<int, int>>(listSize, make_pair(-1, INT_MAX)));
 
         //Djikstra for every vertex, to get the cost and path of every vertex like Floyd Warshall
@@ -350,7 +355,8 @@ class graph
                 cost[i][j] = visited[j];
             }
         }
-
+        
+        //Skip if not found the path
         if(cost[start][end].second == INT_MAX)
         {
             return -1;
