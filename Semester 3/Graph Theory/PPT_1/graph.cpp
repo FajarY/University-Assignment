@@ -11,6 +11,37 @@ class djikstraComparer
         return left.second >= right.second;
     }
 };
+struct aStarNode
+{
+    public:
+    int vertex;
+    int gCost;
+    int fCost;
+
+    aStarNode(int vertex, int gCost, int fCost)
+    {
+        this->vertex = vertex;
+        this->gCost = gCost;
+        this->fCost = fCost;
+    }
+};
+class aStarComparer
+{
+    public:
+    bool operator() (const aStarNode& left, const aStarNode& right) const
+    {
+        if(left.fCost > right.fCost)
+        {
+            return true;
+        }
+        else if(left.fCost == right.fCost)
+        {
+            return left.gCost >= right.gCost;
+        }
+        
+        return false;
+    }
+};
 
 //All algorithm cannot work with negative cycle
 class graph
@@ -194,6 +225,89 @@ class graph
 
         returnPath.push_back(start);
         return cost[end].second;
+    }
+
+    int aStar(int start, int end, vector<int>& returnPath)
+    {
+        //Get heuristic from simple bfs
+        vector<int> heuristic = vector<int>(listSize, INT_MAX);
+        queue<pair<int, int>> heuristicOpenSet;
+        heuristic[end] = 0;
+        
+        heuristicOpenSet.push(make_pair(end, 0));
+        while(!heuristicOpenSet.empty())
+        {
+            pair<int, int> current = heuristicOpenSet.back();
+            heuristicOpenSet.pop();
+
+            for(int i = 0; i < edges[current.first].size(); i++)
+            {
+                pair<int, int> edge = edges[current.first][i];
+
+                int newCost = edge.second + current.second;
+                if(heuristic[edge.first] == INT_MAX)
+                {
+                    heuristic[edge.first] = newCost;
+                    heuristicOpenSet.push(make_pair(edge.first, newCost));
+                }
+            }
+        }
+
+        //A Star
+        vector<pair<int, aStarNode>> visited = vector<pair<int, aStarNode>>(listSize, make_pair(-1, aStarNode(-1, INT_MAX, INT_MAX)));
+        priority_queue<aStarNode, vector<aStarNode>, aStarComparer> openSet; 
+        aStarComparer comparator;
+
+        aStarNode startNode = aStarNode(start, 0, heuristic[start]);
+        visited[start] = make_pair(start, startNode);
+        openSet.push(startNode);
+
+        bool foundPath = false;
+        while(!openSet.empty())
+        {
+            aStarNode current = openSet.top();
+            openSet.pop();
+
+            //If the visited is not bigger skip
+            if(!comparator(visited[current.vertex].second, current))
+            {
+                continue;
+            }
+            if(current.vertex == end)
+            {
+                foundPath = true;
+            }
+
+            for(int i = 0; i < edges[current.vertex].size(); i++)
+            {
+                pair<int, int> edge = edges[current.vertex][i];
+
+                int newGCost = current.gCost + edge.second;
+                aStarNode newNode = aStarNode(edge.first, newGCost, newGCost + heuristic[edge.first]);
+
+                if(visited[edge.first].first == -1 || comparator(visited[edge.first].second, newNode))
+                {
+                    visited[edge.first] = make_pair(current.vertex, newNode);
+                    openSet.push(newNode);
+                }
+            }
+        }
+
+        if(foundPath)
+        {
+            int current = end;
+
+            while(current != start)
+            {
+                returnPath.push_back(current);
+                current = visited[current].first;
+            }
+            returnPath.push_back(start);
+
+            return visited[end].second.gCost;
+        }
+
+        return -1;
     }
 
     //Algorithm to check the cost of every vertex to every vertex. Also modified to add traversal from every vertex to any vertex
@@ -434,8 +548,13 @@ int main()
     }
     cout << endl << endl;
     
-    cout << "A Star : " << "To Be Continued" << endl;
-    //TODO
+    vector<int> aStarPath;
+    int aStarCost = graphObj.aStar(START, END, aStarPath);
+    cout << "A Star : " << aStarCost << endl;
+    for(int i = aStarPath.size() - 1; i >= 0; i--)
+    {
+        cout << aStarPath[i] << " ";
+    }
     cout << endl << endl;
 
     vector<int> floydPath;
