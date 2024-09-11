@@ -1,0 +1,29 @@
+.table-first
+{
+    border: solid black 1px;
+    box-shadow: 2px 2px lightgray;
+
+    tr
+    {
+        td
+        {
+            border: solid black 1px;
+        }
+    }
+}
+
+.table-second
+{
+    border: solid black 1px;
+    border-collapse: collapse;
+    width: 500px;
+
+    tr
+    {
+        td
+        {
+            padding: 5px;
+            border: solid black 1px;
+        }
+    }
+}
