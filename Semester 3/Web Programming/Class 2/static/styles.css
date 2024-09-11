@@ -1,3 +1,9 @@
+body
+{
+    margin: 0px;
+    font-family: 'Inter';
+}
+
 .table-class
 {
     border: solid black 1px;
@@ -32,15 +38,145 @@
     }
 }
 
-cv
+.cv
 {
     display: grid;
-    grid-template-columns: 30% 70%;
-    grid-template-rows: 100px 1000px;
+    grid-template-columns: 20% 80%;
+    grid-template-rows: 100px 1000px 100px;
 
     .top
     {
+        grid-column-start: 1;
+        grid-column-end: 3;
+        grid-row-start: 1;
+        grid-row-end: 2;
 
+        background-color: black;
+        color: white;
+
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: start;
+
+        h1
+        {
+            margin: 0px;
+            margin-inline: 10px;
+        }
+        h2
+        {
+            margin: 0px;
+            margin-inline: 10px;
+            font-weight: normal;
+        }
     }
-    .
+    .main-left
+    {
+        grid-column: 1 / 2;
+        grid-row: 2 / 3;
+
+        background-color: rgb(151, 212, 240);
+        border-right: double black 5px;
+
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        align-items: center;
+        justify-content: start;
+    }
+    .main-item
+    {
+        margin-inline: 24px;
+
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+
+        background-color: white;
+
+        display: flex;
+        flex-direction: column;
+
+        .item
+        {
+            border-bottom: double black 5px;
+        }
+    }
+    footer
+    {
+        grid-column: 1 / -1;
+        grid-row: 3 / 4;
+
+        background-color: black;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.overflow-item
+{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    justify-content: center;
+    
+    img
+    {
+        padding: 10px;
+        width: auto;
+        height: 50px;
+        object-fit: scale-down;
+    }
+}
+.left-right-item
+{
+    display: flex;
+    flex-direction: row;
+    margin-block: 16px;
+
+    .left
+    {
+        width: 80%;
+        p
+        {
+            margin-block: 0px;
+            font-weight: bold;
+        }
+    }
+    .right
+    {
+        width: 20%;
+        text-align: end;
+        p
+        {
+            margin-block: 0px;
+        }
+    }
+}
+
+.button-cool
+{
+    border: none;
+    background-color: rgb(85, 169, 230);
+    border-radius: 10px;
+    font-weight: bold;
+    color: white;
+
+    padding: 20px;
+    padding-block: 15px;
+
+    cursor: pointer;
+
+    transition: all ease-in-out 0.2s;
+}
+.button-cool:hover
+{
+    color: black;
+    background-color: white;
 }
