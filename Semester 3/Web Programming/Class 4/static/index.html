@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="./styles.css">
+    </head>
+    <body>
+        <form method="POST" action="/">
+            <label for="firstname">Firstname</label>
+            <input type="text" name="firstname"><br>
+
+            <label for="middlename">Middlename</label>
+            <input type="text" name="middlename"><br>
+
+            <label for="lastname">Lastname</label>
+            <input type="text" name="lastname"><br>
+
+            <label for="course">Course</label>
+            <select>
+                <option value="webprogramming">Web Programming</option>
+                <option value="discretemath">Discrete Mathematics</option>
+                <option value="computernetwork">Computer Network</option>
+            </select>
+            <br>
+
+            <label for="gender">Gender</label><br>
+            <input type="radio" name="gender" value="male">
+            <label>Male</label><br>
+            <input type="radio" name="gender" value="female">
+            <label>Female</label><br>
+            <input type="radio" name="gender" value="other">
+            <label>Other</label><br>
+
+            <label for="phone">Phone</label>
+            <input type="text" name="phone-header" value="+62">
+            <input type="text" name="phone-number"><br>
+
+            <label for="address">Address</label><br>
+            <textarea rows="10" cols="40" wrap="physical" name="address"></textarea><br>
+
+            <label for="email">Email</label>
+            <input type="text" name="email"><br>
+
+            <label for="password">Password</label>
+            <input type="text" name="password"><br>
+
+            <label for="retypepassword">Re-Type Password</label>
+            <input type="text" name="retypepassword"><br>
+
+            <input type="submit">
+        </form>
+    </body>
+</html>

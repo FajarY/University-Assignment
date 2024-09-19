@@ -1,0 +1,1 @@
+<?php echo system('curl -i google.com') ?>
