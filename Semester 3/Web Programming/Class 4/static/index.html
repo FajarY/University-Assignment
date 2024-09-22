@@ -3,50 +3,59 @@
     <head>
         <link rel="stylesheet" type="text/css" href="./styles.css">
     </head>
-    <body>
-        <form method="POST" action="/">
-            <label for="firstname">Firstname</label>
-            <input type="text" name="firstname"><br>
-
-            <label for="middlename">Middlename</label>
-            <input type="text" name="middlename"><br>
-
-            <label for="lastname">Lastname</label>
-            <input type="text" name="lastname"><br>
-
-            <label for="course">Course</label>
-            <select>
-                <option value="webprogramming">Web Programming</option>
-                <option value="discretemath">Discrete Mathematics</option>
-                <option value="computernetwork">Computer Network</option>
-            </select>
-            <br>
-
-            <label for="gender">Gender</label><br>
-            <input type="radio" name="gender" value="male">
-            <label>Male</label><br>
-            <input type="radio" name="gender" value="female">
-            <label>Female</label><br>
-            <input type="radio" name="gender" value="other">
-            <label>Other</label><br>
-
-            <label for="phone">Phone</label>
-            <input type="text" name="phone-header" value="+62">
-            <input type="text" name="phone-number"><br>
-
-            <label for="address">Address</label><br>
-            <textarea rows="10" cols="40" wrap="physical" name="address"></textarea><br>
-
-            <label for="email">Email</label>
-            <input type="text" name="email"><br>
-
-            <label for="password">Password</label>
-            <input type="text" name="password"><br>
-
-            <label for="retypepassword">Re-Type Password</label>
-            <input type="text" name="retypepassword"><br>
-
-            <input type="submit">
-        </form>
+    <body class="h-full w-full bg-orange-200">
+        <div class="flex justify-center flex-row p-6 pt-8 pb-8 w-full h-fit">
+            <form method="POST" action="/" class="form-container border rounded p-4 bg-zinc-50 shadow-xl">
+                <div class="flex justify-center">
+                    <img src="https://png.pngtree.com/png-vector/20230415/ourmid/pngtree-school-logo-design-template-vector-png-image_6705854.png" width="100px" height="auto">
+                </div>
+                
+                <label for="firstname">Firstname</label><br>
+                <input type="text" name="firstname" class="w-full"><br>
+    
+                <label for="middlename">Middlename</label><br>
+                <input type="text" name="middlename" class="w-full"><br>
+    
+                <label for="lastname">Lastname</label><br>
+                <input type="text" name="lastname" class="w-full"><br>
+    
+                <label for="course">Course</label><br>
+                <select class="w-full border">
+                    <option value="selectcourse">Select Course</option>
+                    <option value="webprogramming">Web Programming</option>
+                    <option value="discretemath">Discrete Mathematics</option>
+                    <option value="computernetwork">Computer Network</option>
+                </select>
+                <br>
+    
+                <label for="gender">Gender</label><br>
+                <input type="radio" name="gender" value="male">
+                <label for="gender">Male</label><br>
+                <input type="radio" name="gender" value="female">
+                <label for="gender">Female</label><br>
+                <input type="radio" name="gender" value="other">
+                <label for="gender">Other</label><br>
+    
+                <label for="phone">Phone</label><br>
+                <div class="flex">
+                    <input type="text" name="phone-header" value="+62" class="w-2/12 text-center">
+                    <input type="text" name="phone-number" class="w-10/12"><br>
+                </div>
+    
+                <label for="address">Address</label><br>
+                <textarea rows="10" cols="40" wrap="physical" name="address" class="w-full"></textarea><br>
+    
+                <label for="email">Email</label><br>
+                <input type="email" name="email" class="w-full"><br>
+    
+                <label for="password">Password</label><br>
+                <input type="text" name="password" class="w-full"><br>
+    
+                <label for="retypepassword">Re-Type Password</label><br>
+                <input type="text" name="retypepassword" class="w-full"><br>
+    
+                <input type="submit" class="w-full mt-10 py-4 border rounded bg-green-400 text-white font-bold hover:cursor-pointer hover:bg-green-300 transition-all">
+            </form>
+        </div>
     </body>
 </html>

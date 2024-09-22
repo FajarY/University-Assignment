@@ -100,6 +100,10 @@ class graph
 
         return weight;
     }
+    int boruvka()
+    {
+        
+    }
 };
 
 int main()

@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components
+{
+    .form-container
+    {
+        label
+        {
+            @apply font-semibold
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select
+        {
+            @apply border rounded p-2 hover:bg-gray-50 focus:bg-gray-50 transition-all
+        }
+
+        label[for="gender"]
+        {
+            @apply font-normal
+        }
+
+        option
+        {
+            all:unset;
+            @apply hover:bg-red-200
+        }
+
+        *
+        {
+            @apply my-1
+        }
+    }
+}

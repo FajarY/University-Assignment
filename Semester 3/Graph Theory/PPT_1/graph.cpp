@@ -237,7 +237,7 @@ class graph
         heuristicOpenSet.push(make_pair(end, 0));
         while(!heuristicOpenSet.empty())
         {
-            pair<int, int> current = heuristicOpenSet.back();
+            pair<int, int> current = heuristicOpenSet.front();
             heuristicOpenSet.pop();
 
             for(int i = 0; i < edges[current.first].size(); i++)
@@ -253,6 +253,13 @@ class graph
             }
         }
 
+        cout << endl;
+        for(int i = 0; i < heuristic.size(); i++)
+        {
+            cout << heuristic[i] << endl;
+        }
+        cout << endl << endl;
+
         //A Star
         vector<pair<int, aStarNode>> visited = vector<pair<int, aStarNode>>(listSize, make_pair(-1, aStarNode(-1, INT_MAX, INT_MAX)));
         priority_queue<aStarNode, vector<aStarNode>, aStarComparer> openSet; 
@@ -267,6 +274,8 @@ class graph
         {
             aStarNode current = openSet.top();
             openSet.pop();
+
+            cout << current.vertex << endl;
 
             //If the visited is not bigger skip
             if(!comparator(visited[current.vertex].second, current))
