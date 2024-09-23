@@ -30,6 +30,15 @@ public class NumberDisplay {
 
         return residu;
     }
+    public void setValue(int value)
+    {
+        if(value < 0 || value > limit)
+        {
+            return;
+        }
+
+        this.value = value;
+    }
     public int getValue()
     {
         return this.value;

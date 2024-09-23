@@ -48,6 +48,12 @@ public class ClockDisplay {
     {
         return hours.getValue();
     }
+    public void setTime(int hours, int minute, int second)
+    {
+        this.hours.setValue(hours);
+        this.minutes.setValue(minute);
+        this.second.setValue(second);
+    }
     public String getTimeString()
     {
         return getHours() + ":" + getMinutes() + ":" + getSecond();

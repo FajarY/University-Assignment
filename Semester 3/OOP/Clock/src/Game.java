@@ -1,16 +1,17 @@
 import java.awt.*;
+import java.sql.Time;
+import java.time.LocalTime;
 
 public class Game {
     public ClockDisplay clockDisplay;
-    public Canvas canvas;
 
     public Game()
     {
         clockDisplay = new ClockDisplay();
 
-        canvas = new Canvas();
-        canvas.setVisible(true);
-        canvas.setFont(new Font("Dialog", Font.PLAIN, 96));
+        LocalTime time = java.time.LocalTime.now();
+        System.out.println(time.toString());
+        clockDisplay.setTime(time.getHour(), time.getMinute(), time.getSecond());
     }
     public void update()
     {

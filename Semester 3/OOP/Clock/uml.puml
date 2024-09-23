@@ -1,0 +1,52 @@
+@startuml
+
+class NumberDisplay {
+    - int value
+    - int limit
+    + NumberDisplay(int initialValue, int limit)
+    + int increment(int value)
+    + void setValue(int value)
+    + int getValue()
+    + int getLimit()
+}
+
+class ClockDisplay {
+    - NumberDisplay hours
+    - NumberDisplay minutes
+    - NumberDisplay second
+    - long deltaTime
+    + ClockDisplay()
+    + void incrementSecond(int secondAmount)
+    + void update()
+    + int getSecond()
+    + int getMinutes()
+    + int getHours()
+    + void setTime(int hours, int minute, int second)
+    + String getTimeString()
+}
+
+class Game {
+    + ClockDisplay clockDisplay
+    + Game()
+    + void update()
+}
+
+class Main {
+    + static final long FPS
+    + static final long DELAY
+    - static long lastTime
+    - static long deltaTime
+    - static Game game
+    + static void main(String[] args)
+    + static long getDeltaMilliSecond()
+    - static void runTask()
+}
+
+Main --> Game : uses
+Game --> ClockDisplay : uses
+ClockDisplay --> NumberDisplay : uses
+Main ..> ScheduledExecutorService : uses
+Main ..> TimeUnit : uses
+Game ..> LocalTime : uses
+
+@enduml
