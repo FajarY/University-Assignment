@@ -1,0 +1,65 @@
+@startuml
+
+class Utility {
+    + static void Initialize()
+    + static float getRandomFloat(float min, float max)
+    + static long getRandomLong(long min, long max)
+}
+
+class Track {
+    - String title
+    - String filePath
+    - long durationMillisecond
+    + Track(String title, String filePath)
+    + String getTitle()
+    + String getFilePath()
+    + long getDurationMillisecond()
+    - void readFile()
+    + String getTrackMetadata()
+}
+
+class MusicPlayer {
+    - Track currentActiveTrack
+    - long currentTrackPointer
+    - long elapsedFromLast
+    + MusicPlayer()
+    + void playTrack(Track track)
+    + void update()
+    + boolean isCurrentlyPlaying()
+}
+
+class MusicOrganizer {
+    - ArrayList<Track> tracks
+    - MusicPlayer musicPlayer
+    + MusicOrganizer()
+    + void addTrack(String title, String filePath)
+    + void playTrack(int index)
+    + void playRandomTrack()
+    + boolean isCurrentlyPlaying()
+    + void update()
+    + void listAllTracks()
+}
+
+class Main {
+    + static final long FPS
+    + static final long FRAME_TIME
+    - static long lastTime
+    - static long deltaTime
+    - static Runnable task
+    - static MusicOrganizer musicOrganizer
+    + static void main(String[] args)
+    + static void initialize()
+    + static void update() throws InterruptedException
+    + static long getDeltaTimeMillis()
+}
+
+Utility --> Random : uses
+Track --> Utility : uses
+MusicPlayer --> Track : uses
+MusicOrganizer --> Track : uses
+MusicOrganizer --> MusicPlayer : uses
+Main --> MusicOrganizer : uses
+Main ..> Scanner : uses
+Main ..> ScheduledExecutorService : uses
+
+@enduml
