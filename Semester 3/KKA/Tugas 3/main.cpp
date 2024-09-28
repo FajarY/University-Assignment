@@ -28,6 +28,18 @@ bool containsOnVector(vector<T, allocator<T>>* list, T data)
     }
     return false;
 }
+template <typename T, typename K>
+class pairHasher
+{
+    public:
+    size_t operator() (const pair<T, K>& p) const 
+    {
+        size_t hash1 = hash<T>{}(p.first);
+        size_t hash2 = hash<K>{}(p.second);
+        return hash1 ^ (hash2 << 1);
+    }
+};
+
 class grid
 {
     private:
@@ -264,10 +276,146 @@ void greedyBestFirstSearch(grid& data, pair<int, int> start, pair<int, int> targ
 {
 
 }
+
+struct aStarNode
+{
+    public:
+    pair<int, int> from;
+    pair<int, int> pos;
+    double gCost;
+    double fCost;
+
+    aStarNode()
+    {
+
+    }
+    aStarNode(pair<int, int> from, pair<int, int> pos, double gCost, double fCost)
+    {
+        this->from = from;
+        this->pos = pos;
+        this->gCost = gCost;
+        this->fCost = fCost;
+    }
+    bool operator() (const aStarNode& left, const aStarNode& right)
+    {
+        if(left.fCost > right.fCost)
+        {
+            return true;
+        }
+        else if(left.fCost == right.fCost)
+        {
+            return left.gCost >= right.gCost;
+        }
+
+        return false;
+    }
+    bool compareWithoutEquals (const aStarNode& left, const aStarNode& right)
+    {
+        if(left.fCost > right.fCost)
+        {
+            return true;
+        }
+        else if(left.fCost == right.fCost)
+        {
+            return left.gCost > right.gCost;
+        }
+
+        return false;
+    }
+};
+void addAStarNode(grid& data, aStarNode current, int xAdder, int yAdder, pair<int, int> target, unordered_map<pair<int, int>, aStarNode, pairHasher<int, int>>& assigned, priority_queue<aStarNode, vector<aStarNode>, aStarNode>& openSet, unordered_set<pair<int, int>, pairHasher<int, int>>& visited)
+{
+    pair<int, int> toPos = make_pair(current.pos.first + xAdder, current.pos.second + yAdder);
+
+    int tile = data.getTile(toPos.first, toPos.second);
+    if(tile == -1 || tile == 1)
+    {
+        return;
+    }
+    if(visited.find(toPos) != visited.end())
+    {
+        return;
+    }
+
+    double addCost = NORMAL_COST;
+    if(xAdder != 0 && yAdder != 0)
+    {
+        addCost = DIAGONAL_COST;
+    }
+
+    double newGCost = current.gCost + addCost;
+    double newFCost = newGCost + getHeuristic(toPos, target);
+    aStarNode newNode = aStarNode(current.pos, toPos, newGCost, newFCost);
+
+    if(assigned.find(toPos) != assigned.end())
+    {
+        if(!current.compareWithoutEquals(assigned[toPos], newNode))
+        {
+            return;
+        }
+    }
+
+    assigned[toPos] = newNode;
+    openSet.push(newNode);
+}
 void aStar(grid& data, pair<int, int> start, pair<int, int> target, double& outputCost, vector<pair<int, int>>& path)
 {
-    
+    unordered_map<pair<int, int>, aStarNode, pairHasher<int, int>> assigned;
+    priority_queue<aStarNode, vector<aStarNode>, aStarNode> openSet;
+    unordered_set<pair<int, int>, pairHasher<int, int>> visited;
+
+    aStarNode startNode = aStarNode(start, start, 0.0, getHeuristic(start, target));
+    assigned[start] = startNode;
+    openSet.push(startNode);
+
+    bool found = false;
+    while(!openSet.empty())
+    {
+        aStarNode current = openSet.top();
+        openSet.pop();
+        
+        if(!current(assigned[current.pos], current))
+        {
+            continue;
+        }
+
+        visited.insert(current.pos);
+
+        if(current.pos == target)
+        {
+            found = true;
+            break;
+        }
+
+        addAStarNode(data, current, -1, 0, target, assigned, openSet, visited);
+        addAStarNode(data, current, -1, 1, target, assigned, openSet, visited);
+        addAStarNode(data, current, 0, 1, target, assigned, openSet, visited);
+        addAStarNode(data, current, 1, 1, target, assigned, openSet, visited);
+        addAStarNode(data, current, 1, 0, target, assigned, openSet, visited);
+        addAStarNode(data, current, 1, -1, target, assigned, openSet, visited);
+        addAStarNode(data, current, 0, -1, target, assigned, openSet, visited);
+        addAStarNode(data, current, -1, -1, target, assigned, openSet, visited);
+    }
+
+    if(found)
+    {
+        outputCost = assigned[target].gCost;
+
+        pair<int, int> current = target;
+        while(current != start)
+        {
+            path.push_back(current);
+            current = assigned[current].from;
+        }
+        path.push_back(start);
+    }
+    else
+    {
+        outputCost = -1.0;
+    }
 }
+
+
 void idAStar(grid& data, pair<int, int> start, pair<int, int> target, double& outputCost, vector<pair<int, int>>& path)
 {
 
