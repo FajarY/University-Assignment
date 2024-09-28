@@ -11,6 +11,8 @@ using namespace std;
     1 : Obstacle (w)
 
     path (x)
+    start (s)
+    target (t)
 */
 
 //Other
@@ -154,7 +156,7 @@ class grid
             cout << endl;
         }
     }
-    void printTilesAliasStartEndPath(pair<int, int> start, pair<int, int> target, vector<pair<int, int>> path)
+    void printTilesAliasStartEndPath(pair<int, int> start, pair<int, int> target, vector<pair<int, int>>& path)
     {
         int startY = height - 1;
         int addSpace = height / 10;
@@ -249,15 +251,24 @@ grid* readFromTxt(string path)
     return data;
 }
 
-void greedyBestFirstSearch(grid& data, pair<int, int> start, pair<int, int> target, int& outputCost, vector<pair<int, int>>& path)
+double getHeuristic(pair<int, int> current, pair<int, int> target)
 {
-    
+    int x = target.first - current.first;
+    int y = target.second - current.second;
+    return sqrt((double)(x*x + y*y));
 }
-void aStar(grid& data, pair<int, int> start, pair<int, int> target, int& outputCost, vector<pair<int, int>>& path)
+double NORMAL_COST = 1.0;
+double DIAGONAL_COST = getHeuristic(make_pair(0, 0), make_pair(1, 1));
+
+void greedyBestFirstSearch(grid& data, pair<int, int> start, pair<int, int> target, double& outputCost, vector<pair<int, int>>& path)
 {
 
 }
-void idAStar(grid& data, pair<int, int> start, pair<int, int> target, int& outputCost, vector<pair<int, int>>& path)
+void aStar(grid& data, pair<int, int> start, pair<int, int> target, double& outputCost, vector<pair<int, int>>& path)
+{
+    
+}
+void idAStar(grid& data, pair<int, int> start, pair<int, int> target, double& outputCost, vector<pair<int, int>>& path)
 {
 
 }
@@ -268,27 +279,27 @@ int main()
 
     pair<int, int> start = make_pair(11, 0);
     pair<int, int> target = make_pair(18, 14);
-    
+
     cout << "GFS" << endl;
-    int gfsCost = 0;
+    double gfsCost = 0;
     vector<pair<int, int>> gfsPath = vector<pair<int, int>>();
     greedyBestFirstSearch(*data, start, target, gfsCost, gfsPath);
     data->printTilesAliasStartEndPath(start, target, gfsPath);
-    cout << endl << endl;
+    cout << gfsCost << endl << endl;
 
     cout << "AStar" << endl;
-    int aStarCost = 0;
+    double aStarCost = 0;
     vector<pair<int, int>> aStarPath = vector<pair<int, int>>();
     aStar(*data, start, target, aStarCost, aStarPath);
     data->printTilesAliasStartEndPath(start, target, aStarPath);
-    cout << endl << endl;
+    cout << aStarCost << endl << endl;
 
     cout << "IdAStar" << endl;
-    int idAStarCost = 0;
+    double idAStarCost = 0;
     vector<pair<int, int>> idAStarPath = vector<pair<int, int>>();
     idAStar(*data, start, target, idAStarCost, idAStarPath);
     data->printTilesAliasStartEndPath(start, target, idAStarPath);
-    cout << endl << endl;
+    cout << idAStarCost << endl << endl;
 
     return 0;
 }
