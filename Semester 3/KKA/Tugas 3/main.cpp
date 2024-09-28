@@ -45,7 +45,7 @@ class grid
     }
     bool withinBounds(int x, int y)
     {
-        return x >= 0 && y >= 0 && x < width && x < height;
+        return x >= 0 && y >= 0 && x < width && y < height;
     }
     int getTile(int x, int y)
     {
