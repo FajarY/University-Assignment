@@ -516,7 +516,11 @@ void idAStar(grid &data, pair<int, int> start, pair<int, int> target, double &ou
             }
             if(current.fCost > threshold)
             {
-                if(current.fCost > newThreshold)
+                if(newThreshold == -1.0)
+                {
+                    newThreshold = current.fCost;
+                }
+                else if(current.fCost < newThreshold)
                 {
                     newThreshold = current.fCost;
                 }
