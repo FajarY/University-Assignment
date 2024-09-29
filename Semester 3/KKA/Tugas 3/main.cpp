@@ -272,26 +272,22 @@ double getHeuristic(pair<int, int> current, pair<int, int> target)
 double NORMAL_COST = 1.0;
 double DIAGONAL_COST = getHeuristic(make_pair(0, 0), make_pair(1, 1));
 
-void greedyBestFirstSearch(grid &data, pair<int, int> start, pair<int, int> target,
-                           double &outputCost, vector<pair<int, int>> &path)
+void greedyBestFirstSearch(grid &data, pair<int, int> start, pair<int, int> target, double &outputCost, vector<pair<int, int>> &path)
 {
-    priority_queue<pair<double, pair<int, int>>, vector<pair<double, pair<int, int>>>,
-                   greater<pair<double, pair<int, int>>>>
-        queue;                                // queue with weight, x, y
-    map<pair<int, int>, int> visited;         // to not push a node in the queue if it has already been visited
-    pair<int, int> neighbor;                  // helper variable
-    map<pair<int, int>, pair<int, int>> pred; // to save the previous node of the current node
+    priority_queue<pair<double, pair<int, int>>, vector<pair<double, pair<int, int>>>, greater<pair<double, pair<int, int>>>> queue;
+    map<pair<int, int>, int> visited;
+    pair<int, int> neighbor;
+    map<pair<int, int>, pair<int, int>> pred;
 
-    // initial set up
     double weight = getHeuristic(start, target);
     queue.push(make_pair(weight, start));
     visited[start] = 1;
 
     while (queue.top().second != target && !queue.empty())
     {
-        int x = queue.top().second.first;  // x coordinate
-        int y = queue.top().second.second; // y coordinate
-        queue.pop();                       // remove node from the queue
+        int x = queue.top().second.first;
+        int y = queue.top().second.second;
+        queue.pop();
 
         vector<pair<int, int>> directions = {
             {0, 1},   // atas
@@ -305,38 +301,38 @@ void greedyBestFirstSearch(grid &data, pair<int, int> start, pair<int, int> targ
         };
 
         for (auto direction : directions)
-        { // Loop through each direction
+        {
             int newX = x + direction.first;
             int newY = y + direction.second;
 
             if (data.getTile(newX, newY) == 0)
-            { // check if the node is valid
+            {
                 neighbor = make_pair(newX, newY);
                 if (visited.find(neighbor) == visited.end())
-                { // check if not visited
+                {
                     weight = getHeuristic(neighbor, target);
-                    queue.push(make_pair(weight, neighbor)); // push the node into pqueue
+                    queue.push(make_pair(weight, neighbor));
 
-                    visited[neighbor] = 1;   // mark visited
-                    pred[neighbor] = {x, y}; // save the previous node
+                    visited[neighbor] = 1;
+                    pred[neighbor] = {x, y};
                 }
             }
         }
     }
 
-    pair<int, int> key = target; // helper variable for traversing paths
+    pair<int, int> key = target;
     while (key != start)
     {
         path.insert(path.begin(), key);
         if (pred[key].first == key.first || pred[key].second == key.second)
-        { // check that there is no diagonal movement
+        {
             outputCost += NORMAL_COST;
         }
         else
         {
             outputCost += DIAGONAL_COST;
         }
-        key = pred[key]; // update to traverse more until the key reaches the start node
+        key = pred[key];
     }
 }
 
@@ -478,7 +474,7 @@ void aStar(grid &data, pair<int, int> start, pair<int, int> target, double &outp
     }
 }
 
-//IDA*
+// IDA*
 void idAStar(grid &data, pair<int, int> start, pair<int, int> target, double &outputCost, vector<pair<int, int>> &path)
 {
     double threshold = getHeuristic(start, target);
@@ -486,7 +482,7 @@ void idAStar(grid &data, pair<int, int> start, pair<int, int> target, double &ou
     bool foundPath = false;
     outputCost = -1.0;
 
-    while(!foundPath && threshold != -1.0)
+    while (!foundPath && threshold != -1.0)
     {
         unordered_map<pair<int, int>, aStarNode, pairHasher<int, int>> assigned;
         priority_queue<aStarNode, vector<aStarNode>, aStarNode> openSet;
@@ -497,7 +493,7 @@ void idAStar(grid &data, pair<int, int> start, pair<int, int> target, double &ou
         openSet.push(startNode);
         newThreshold = -1.0;
 
-        while(!openSet.empty())
+        while (!openSet.empty())
         {
             aStarNode current = openSet.top();
             openSet.pop();
@@ -514,13 +510,13 @@ void idAStar(grid &data, pair<int, int> start, pair<int, int> target, double &ou
                 foundPath = true;
                 break;
             }
-            if(current.fCost > threshold)
+            if (current.fCost > threshold)
             {
-                if(newThreshold == -1.0)
+                if (newThreshold == -1.0)
                 {
                     newThreshold = current.fCost;
                 }
-                else if(current.fCost < newThreshold)
+                else if (current.fCost < newThreshold)
                 {
                     newThreshold = current.fCost;
                 }
