@@ -41,6 +41,8 @@
         "utility": "cpp",
         "typeindex": "cpp",
         "valarray": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "source_location": "cpp",
+        "stacktrace": "cpp"
     }
 }
