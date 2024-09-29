@@ -43,6 +43,9 @@
         "valarray": "cpp",
         "*.tcc": "cpp",
         "source_location": "cpp",
-        "stacktrace": "cpp"
+        "stacktrace": "cpp",
+        "chrono": "cpp",
+        "algorithm": "cpp",
+        "format": "cpp"
     }
 }

@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <chrono>
 
 using namespace std;
 /*
@@ -169,6 +170,47 @@ public:
         }
     }
     void printTilesAliasStartEndPath(pair<int, int> start, pair<int, int> target, vector<pair<int, int>> &path)
+    {
+        int startY = height - 1;
+        int addSpace = height / 10;
+
+        for (int y = startY; y >= 0; y--)
+        {
+            cout << "[" << y << "] ";
+
+            int currentAddSpace = addSpace - (y / 10);
+            for (int i = 0; i < currentAddSpace; i++)
+            {
+                cout << " ";
+            }
+            cout << "| ";
+            for (int x = 0; x < width; x++)
+            {
+                if (start == make_pair(x, y))
+                {
+                    cout << "s" << " ";
+                }
+                else if (target == make_pair(x, y))
+                {
+                    cout << "t" << " ";
+                }
+                else if (containsOnVector<pair<int, int>>(&path, make_pair(x, y)))
+                {
+                    cout << "x" << " ";
+                }
+                else if (tiles[y][x] == 1)
+                {
+                    cout << "w" << " ";
+                }
+                else
+                {
+                    cout << ". ";
+                }
+            }
+            cout << endl;
+        }
+    }
+    void printTilesAliasStartEndPathExplored(pair<int, int> start, pair<int, int> target, vector<pair<int, int>> &path)
     {
         int startY = height - 1;
         int addSpace = height / 10;
@@ -551,6 +593,17 @@ void idAStar(grid &data, pair<int, int> start, pair<int, int> target, double &ou
     }
 }
 
+//Monitoring
+chrono::_V2::system_clock::time_point getCurrentTime()
+{
+    return chrono::high_resolution_clock::now();
+}
+double calculateMS(chrono::_V2::system_clock::time_point start, chrono::_V2::system_clock::time_point end)
+{
+    chrono::duration<double> duration = end - start;
+    return chrono::duration_cast<chrono::nanoseconds>(duration).count() / 1000000.0;
+}
+
 int main()
 {
     grid *data = readFromTxt("./tile.txt");
@@ -558,28 +611,40 @@ int main()
     pair<int, int> start = make_pair(11, 0);
     pair<int, int> target = make_pair(18, 14);
 
-    cout << "GFS" << endl;
+    cout << "GBFS" << endl;
     double gfsCost = 0;
     vector<pair<int, int>> gfsPath = vector<pair<int, int>>();
+
+    auto startGBFS = getCurrentTime();
     greedyBestFirstSearch(*data, start, target, gfsCost, gfsPath);
+    auto endGBFS = getCurrentTime();
+
     data->printTilesAliasStartEndPath(start, target, gfsPath);
-    cout << gfsCost << endl
+    cout << gfsCost << ", Runtime " << calculateMS(startGBFS, endGBFS) << "ms" << endl
          << endl;
 
     cout << "AStar" << endl;
     double aStarCost = 0;
     vector<pair<int, int>> aStarPath = vector<pair<int, int>>();
+
+    auto startAStar = getCurrentTime();
     aStar(*data, start, target, aStarCost, aStarPath);
+    auto endAStar = getCurrentTime();
+
     data->printTilesAliasStartEndPath(start, target, aStarPath);
-    cout << aStarCost << endl
+    cout << aStarCost << ", Runtime " << calculateMS(startAStar, endAStar) << "ms" << endl
          << endl;
 
     cout << "IdAStar" << endl;
     double idAStarCost = 0;
     vector<pair<int, int>> idAStarPath = vector<pair<int, int>>();
+
+    auto startIDAStar = getCurrentTime();
     idAStar(*data, start, target, idAStarCost, idAStarPath);
+    auto endIDAStar = getCurrentTime();
+
     data->printTilesAliasStartEndPath(start, target, idAStarPath);
-    cout << idAStarCost << endl
+    cout << idAStarCost << ", Runtime " << calculateMS(startIDAStar, endIDAStar) << endl
          << endl;
 
     return 0;
