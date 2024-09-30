@@ -516,7 +516,54 @@ void aStar(grid &data, pair<int, int> start, pair<int, int> target, double &outp
     }
 }
 
+struct idAStarNode
+{
+    public:
+    pair<int, int> from;
+    pair<int, int> pos;
+    double gCost;
+    double fCost;
+
+    idAStarNode()
+    {
+        
+    }
+    idAStarNode(pair<int, int> from, pair<int, int> pos, double gCost, double fCost)
+    {
+        this->from = from;
+        this->pos = pos;
+        this->gCost = gCost;
+        this->fCost = fCost;
+    }
+};
 // IDA*
+void addIdAStarNode(grid &data, idAStarNode current, int xAdder, int yAdder, pair<int, int> target, unordered_map<pair<int, int>, idAStarNode, pairHasher<int, int>> &assigned, stack<idAStarNode> &openSet)
+{
+    pair<int, int> toPos = make_pair(current.pos.first + xAdder, current.pos.second + yAdder);
+
+    int tile = data.getTile(toPos.first, toPos.second);
+    if (tile == -1 || tile == 1)
+    {
+        return;
+    }
+    if (assigned.find(toPos) != assigned.end())
+    {
+        return;
+    }
+
+    double addCost = NORMAL_COST;
+    if (xAdder != 0 && yAdder != 0)
+    {
+        addCost = DIAGONAL_COST;
+    }
+
+    double newGCost = current.gCost + addCost;
+    double newFCost = newGCost + getHeuristic(toPos, target);
+    idAStarNode newNode = idAStarNode(current.pos, toPos, newGCost, newFCost);
+
+    assigned[toPos] = newNode;
+    openSet.push(newNode);
+}
 void idAStar(grid &data, pair<int, int> start, pair<int, int> target, double &outputCost, vector<pair<int, int>> &path)
 {
     double threshold = getHeuristic(start, target);
@@ -526,26 +573,18 @@ void idAStar(grid &data, pair<int, int> start, pair<int, int> target, double &ou
 
     while (!foundPath && threshold != -1.0)
     {
-        unordered_map<pair<int, int>, aStarNode, pairHasher<int, int>> assigned;
-        priority_queue<aStarNode, vector<aStarNode>, aStarNode> openSet;
-        unordered_set<pair<int, int>, pairHasher<int, int>> visited;
+        unordered_map<pair<int, int>, idAStarNode, pairHasher<int, int>> assigned;
+        stack<idAStarNode> openSet;
 
-        aStarNode startNode = aStarNode(start, start, 0.0, getHeuristic(start, target));
+        idAStarNode startNode = idAStarNode(start, start, 0.0, getHeuristic(start, target));
         assigned[start] = startNode;
         openSet.push(startNode);
         newThreshold = -1.0;
 
         while (!openSet.empty())
         {
-            aStarNode current = openSet.top();
+            idAStarNode current = openSet.top();
             openSet.pop();
-
-            if (!current(assigned[current.pos], current))
-            {
-                continue;
-            }
-
-            visited.insert(current.pos);
 
             if (current.pos == target)
             {
@@ -565,14 +604,14 @@ void idAStar(grid &data, pair<int, int> start, pair<int, int> target, double &ou
                 continue;
             }
 
-            addAStarNode(data, current, -1, 0, target, assigned, openSet, visited);
-            addAStarNode(data, current, -1, 1, target, assigned, openSet, visited);
-            addAStarNode(data, current, 0, 1, target, assigned, openSet, visited);
-            addAStarNode(data, current, 1, 1, target, assigned, openSet, visited);
-            addAStarNode(data, current, 1, 0, target, assigned, openSet, visited);
-            addAStarNode(data, current, 1, -1, target, assigned, openSet, visited);
-            addAStarNode(data, current, 0, -1, target, assigned, openSet, visited);
-            addAStarNode(data, current, -1, -1, target, assigned, openSet, visited);
+            addIdAStarNode(data, current, -1, 0, target, assigned, openSet);
+            addIdAStarNode(data, current, -1, 1, target, assigned, openSet);
+            addIdAStarNode(data, current, 0, 1, target, assigned, openSet);
+            addIdAStarNode(data, current, 1, 1, target, assigned, openSet);
+            addIdAStarNode(data, current, 1, 0, target, assigned, openSet);
+            addIdAStarNode(data, current, 1, -1, target, assigned, openSet);
+            addIdAStarNode(data, current, 0, -1, target, assigned, openSet);
+            addIdAStarNode(data, current, -1, -1, target, assigned, openSet);
         }
 
         threshold = newThreshold;
