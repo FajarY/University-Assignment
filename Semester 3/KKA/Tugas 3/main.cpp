@@ -516,6 +516,7 @@ void aStar(grid &data, pair<int, int> start, pair<int, int> target, double &outp
     }
 }
 
+// IDA*
 struct idAStarNode
 {
     public:
@@ -526,7 +527,7 @@ struct idAStarNode
 
     idAStarNode()
     {
-        
+
     }
     idAStarNode(pair<int, int> from, pair<int, int> pos, double gCost, double fCost)
     {
@@ -536,7 +537,6 @@ struct idAStarNode
         this->fCost = fCost;
     }
 };
-// IDA*
 void addIdAStarNode(grid &data, idAStarNode current, int xAdder, int yAdder, pair<int, int> target, unordered_map<pair<int, int>, idAStarNode, pairHasher<int, int>> &assigned, stack<idAStarNode> &openSet)
 {
     pair<int, int> toPos = make_pair(current.pos.first + xAdder, current.pos.second + yAdder);
