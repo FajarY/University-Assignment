@@ -1,0 +1,41 @@
+@startuml
+
+class Main {
+    - SupportSystem supportSystem
+    + main(String[] args)
+}
+
+class SupportSystem {
+    - Responder responder
+    - InputReader inputReader
+    + start()
+}
+
+class Responder {
+    - HashMap<String, String> respondMapping
+    - ArrayList<String> defaultResponse
+    - Random randomizer
+    + getResponse(InputReader input)
+    - initializeResponse()
+    - initializeDefaultResponse()
+}
+
+class InputReader {
+    - Scanner scanner
+    - ArrayList<String> inputCache
+    + read()
+    + getInputCount(): int
+    + getInputAt(int index): String
+    + contains(String string): boolean
+    + containsIgnoreCasing(String string): boolean
+}
+
+Main -> SupportSystem : creates
+SupportSystem -> Responder : creates
+SupportSystem -> InputReader : creates
+SupportSystem -> Responder : getResponse(input)
+SupportSystem -> InputReader : read()
+
+Responder --> InputReader : uses
+
+@enduml
