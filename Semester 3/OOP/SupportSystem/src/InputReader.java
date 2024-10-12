@@ -12,15 +12,10 @@ public class InputReader {
     }
     public void read()
     {
-        String input = scanner.nextLine();
-        String[] splitArr = input.split(" ");
-
         inputCache.clear();
 
-        for (int i = 0; i < splitArr.length; i++)
-        {
-            inputCache.add(splitArr[i]);
-        }
+        String input = scanner.nextLine();
+        Utility.splitString(input, inputCache);
     }
     public int getInputCount()
     {

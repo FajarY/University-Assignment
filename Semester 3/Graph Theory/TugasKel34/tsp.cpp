@@ -84,9 +84,11 @@ class graph
                     if(i != j && (mask & (1 << j)))
                     {
                         int newCost = memo[j][mask & ~(1 << i)] + costMatrix[j][i];
+                        cout << " " << mask << " " << i << " " << j << " " << newCost << endl;
 
                         if(newCost < memo[i][mask])
                         {
+                            cout << "Set : " << mask << " " << i << " " << j << " " << newCost << endl;
                             memo[i][mask] = newCost;
                             parent[i][mask] = j;
                         }
