@@ -1,0 +1,143 @@
+*
+{
+    box-sizing: border-box;
+}
+
+html, body
+{
+    margin: 0px;
+    padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgb(255, 255, 255);
+}
+
+nav
+{
+    width: 100%;
+    height: fit-content;
+    background-color: black;
+
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+}
+
+.nav-header
+{
+    font-weight: bolder;
+    color: white;
+    padding: 16px;
+}
+.nav-button
+{
+    transition: all 0.15s ease-in-out;
+
+    width: fit-content;
+    padding: 16px;
+    color: white;
+    background-color: black;
+    font-weight: bold;
+    user-select: none;
+    cursor: pointer;
+}
+.nav-button:hover
+{
+    color: black;
+    background-color: white;
+}
+
+.list-berita
+{
+    padding: 16px;
+}
+.list-berita-container
+{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.list-berita-item
+{
+    display: flex;
+    border-radius: 8px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    border: solid black 2px;
+    padding: 16px;
+
+    div
+    {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        img
+        {
+            border-radius: 4px;
+            width: 350px;
+            height: auto;
+        }
+    }
+}
+
+.button-main
+{
+    all: unset;
+    background-color: rgb(94, 177, 255);
+    color: white;
+    border-radius: 8px;
+    padding: 8px;
+    padding-inline: 12px;
+
+    font-weight: bold;
+    transition: all 0.15s ease-in-out;
+
+    cursor: pointer;
+}
+.button-main:hover
+{
+    background-color: rgb(163, 208, 250);
+    color: white;
+}
+
+.berita
+{
+    padding: 16px;
+    div
+    {
+        border: solid 2px black;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        h1
+        {
+            text-align: center;
+        }
+        div
+        {
+            width: 100%;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            img
+            {
+                width: 500px;
+                height: auto;
+            }
+        }
+        h3
+        {
+            text-align: center;
+        }
+        p
+        {
+            padding: 16px;
+            text-align: justify;
+        }
+    }
+}
