@@ -420,6 +420,26 @@ double randomDouble(double min, double max)
 //To allow debugging, uncomment the line bellow
 //#define DEBUG
 
+void randomize(vector<vector<int>>& input, int count)
+{
+    for(int j = 0; j < count; j++)
+    {
+        int index = random(0, input.size() - 1);
+
+        if(input[index].size() == 0)
+        {
+            continue;
+        }
+
+        int left = random(0, input[index].size() - 1);
+        int right = random(0, input[index].size() - 1);
+
+        int temp = input[index][left];
+        input[index][left] = input[index][right];
+        input[index][right] = temp;
+    }
+}
+
 //Hill Climbing
 void hillClimb(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t maximumIterations, int randomChangeAmount)
 {
@@ -445,22 +465,7 @@ void hillClimb(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t ma
 
         vector<vector<int>> neighbour = input;
         int randomAmount = random(1, randomChangeAmount);
-        for(int j = 0; j < randomAmount; j++)
-        {
-            int index = random(0, input.size() - 1);
-
-            if(input[index].size() == 0)
-            {
-                continue;
-            }
-
-            int left = random(0, input[index].size() - 1);
-            int right = random(0, input[index].size() - 1);
-
-            int temp = neighbour[index][left];
-            neighbour[index][left] = neighbour[index][right];
-            neighbour[index][right] = temp;
-        }
+        randomize(neighbour, randomAmount);
 
         grid.read(start, neighbour, indexer);
         clear(indexer);
@@ -496,22 +501,7 @@ void simulatedAnnealing(sudoku& grid, vector<int>& start, int sudokuMaxValue, ui
     for(int i = 0; i < temperatureCheck.size(); i++)
     {
         int randomAmount = random(1, randomChangeAmount);
-        for(int j = 0; j < randomAmount; j++)
-        {
-            int index = random(0, input.size() - 1);
-
-            if(input[index].size() == 0)
-            {
-                continue;
-            }
-
-            int left = random(0, input[index].size() - 1);
-            int right = random(0, input[index].size() - 1);
-
-            int temp = temperatureInput[index][left];
-            temperatureInput[index][left] = temperatureInput[index][right];
-            temperatureInput[index][right] = temp;
-        }
+        randomize(temperatureInput, randomAmount);
 
         grid.read(start, temperatureInput, indexer);
         clear(indexer);
@@ -545,22 +535,7 @@ void simulatedAnnealing(sudoku& grid, vector<int>& start, int sudokuMaxValue, ui
 
         vector<vector<int>> neighbour = input;
         int randomAmount = random(1, randomChangeAmount);
-        for(int j = 0; j < randomAmount; j++)
-        {
-            int index = random(0, input.size() - 1);
-
-            if(input[index].size() == 0)
-            {
-                continue;
-            }
-
-            int left = random(0, input[index].size() - 1);
-            int right = random(0, input[index].size() - 1);
-
-            int temp = neighbour[index][left];
-            neighbour[index][left] = neighbour[index][right];
-            neighbour[index][right] = temp;
-        }
+        randomize(neighbour, randomAmount);
 
         grid.read(start, neighbour, indexer);
         clear(indexer);
@@ -589,6 +564,189 @@ void simulatedAnnealing(sudoku& grid, vector<int>& start, int sudokuMaxValue, ui
     }
 
     cout << "Finished in : " << count << " iterations" << endl << endl;
+    grid.print();
+}
+
+//Genetic
+class geneticComparer
+{
+    public:
+    bool operator() (const pair<int, vector<vector<int>>>& left, const pair<int, vector<vector<int>>>& right) const
+    {
+        return left.first > right.first;
+    }
+};
+void copyTo(vector<int>& from, vector<int>& to)
+{
+    if(from.size() != to.size())
+    {
+        cout << "Brh";
+        return;
+    }
+
+    for(int i = 0; i < from.size(); i++)
+    {
+        to[i] = from[i];
+    }
+}
+void genetic(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t maximumIterations, int halfCount, int randomChangeAmountStart, double mutationProbability, int mutationRandomChange, double tournamentWinChance)
+{
+    cout << "Genetic is running" << endl;
+    if(halfCount % 2 != 0 || halfCount < 2)
+    {
+        cout << "Genetic algorithm cannot run invalid arguments" << endl;
+
+        return;
+    }
+    geneticComparer comparer;
+    vector<vector<int>> input = grid.calculateInputCount(start);
+    vector<int> indexer = vector<int>(input.size(), 0);
+
+    vector<pair<int, vector<vector<int>>>> population = vector<pair<int, vector<vector<int>>>>(halfCount * 2);
+
+    for(int i = 0; i < population.size(); i++)
+    {
+        int randomAmount = random(1, randomChangeAmountStart);
+        vector<vector<int>> sampleInput = input;
+
+        for(int j = 0; j < randomAmount; j++)
+        {
+            int index = random(0, input.size() - 1);
+
+            if(input[index].size() == 0)
+            {
+                continue;
+            }
+
+            int left = random(0, input[index].size() - 1);
+            int right = random(0, input[index].size() - 1);
+
+            int temp = sampleInput[index][left];
+            sampleInput[index][left] = sampleInput[index][right];
+            sampleInput[index][right] = temp;
+        }
+
+        grid.read(start, sampleInput, indexer);
+        clear(indexer);
+        
+        int fitness = grid.getFitness();
+
+        population[i] = make_pair(fitness, sampleInput);
+    }
+
+    uint64_t maximum = maximumIterations;
+    uint64_t count = 0;
+    int greatestFitness = INT_MIN;
+    vector<vector<int>> greatestInput;
+    int currentTournamentIndex = 0;
+
+    while(maximum > 0)
+    {
+        maximum--;
+        count++;
+        currentTournamentIndex = 0;
+
+        for(int i = 0; i < population.size(); i++)
+        {
+            if(greatestFitness < population[i].first)
+            {
+                greatestFitness = population[i].first;
+                greatestInput = population[i].second;
+                cout << "Fitness : " << greatestFitness << " , Gen : " << count << endl;
+            }
+            if(population[i].first == grid.getFullFitness())
+            {
+                goto done;
+            }
+        }
+
+        //Tornament
+        while(currentTournamentIndex < halfCount)
+        {
+            int left = random(currentTournamentIndex, population.size() - 1);
+            int right = random(currentTournamentIndex, population.size() - 1);
+            int middle = random(currentTournamentIndex, population.size() - 1);
+            
+            if(left == right || left == middle || right == middle)
+            {
+                continue;
+            }
+
+            int choose = left;
+            if(population[right].first > population[choose].first && random(0.0, 1.0) < tournamentWinChance)
+            {
+                choose = right;
+            }
+            if(population[middle].first > population[choose].first && random(0.0, 1.0) < tournamentWinChance)
+            {
+                choose = middle;
+            }
+
+            pair<int, vector<vector<int>>> temp = population[currentTournamentIndex];
+            population[currentTournamentIndex] = population[choose];
+            population[choose] = temp;
+            currentTournamentIndex++;
+        }
+
+        for(int i = 0; i < halfCount / 2; i++)
+        {
+            vector<vector<int>>& leftParent = population[i * 2].second;
+            vector<vector<int>>& rightParent = population[i * 2 + 1].second;
+
+            //0 -- 2^(subgrid) - 1
+            uint32_t bitmask = random(0, (1 << (input.size())) - 1);
+
+            pair<int, vector<vector<int>>>& leftChild = population[halfCount + (i * 2)];
+            pair<int, vector<vector<int>>>& rightChild = population[halfCount + (i * 2 + 1)];
+
+            for(int j = 0; j < input.size(); j++)
+            {
+                uint32_t current = bitmask & (1 << j);
+
+                if(current)
+                {
+                    leftChild.second[j] = rightParent[j];
+                    rightChild.second[j] = leftParent[j];
+                }
+                else
+                {
+                    leftChild.second[j] = leftParent[j];
+                    rightChild.second[j] = rightParent[j];
+                }
+            }
+
+            for(int i = 0; i < 2; i++)
+            {
+                double mutation = randomDouble(0.0, 1.0);
+                vector<vector<int>>& current = leftChild.second;
+                if(i == 1)
+                {
+                    current = rightChild.second;
+                }
+                if(mutation > mutationProbability)
+                {
+                    continue;
+                }
+
+                randomize(current, random(1, mutationRandomChange));
+            }
+
+            grid.read(start, leftChild.second, indexer);
+            clear(indexer);
+            leftChild.first = grid.getFitness();
+
+            grid.read(start, rightChild.second, indexer);
+            clear(indexer);
+            rightChild.first = grid.getFitness();
+        }
+
+        sort(population.begin(), population.end(), comparer);
+    }
+
+    done:
+    cout << "Finished in : " << count << " iterations" << endl << endl;
+    grid.read(start, population[0].second, indexer);
+    clear(indexer);
     grid.print();
 }
 
@@ -679,5 +837,17 @@ int main()
     auto startSim9x9 = getCurrentTime();
     simulatedAnnealing(grid9x9, start9x9, 9, UINT_MAX, 20, 0.99);
     cout << "Frame time : " << calculateMS(startSim9x9, getCurrentTime()) << endl << endl;
+    cout << "-------------------------------------------------" << endl << endl;
+
+    cout << "4x4 Grid" << endl;
+    auto startGen4x4 = getCurrentTime();
+    genetic(grid4x4, start4x4, 4, UINT_MAX, 20, 32, 0.1, 5, 0.25);
+    cout << "Frame time : " << calculateMS(startGen4x4, getCurrentTime()) << endl << endl;
+    cout << "-------------------------------------------------" << endl << endl;
+
+    cout << "9x9 Grid" << endl;
+    auto startGen9x9 = getCurrentTime();
+    genetic(grid9x9, start9x9, 9, UINT_MAX, 100, 2000, 0.1, 20, 0.5);
+    cout << "Frame time : " << calculateMS(startGen9x9, getCurrentTime()) << endl << endl;
     cout << "-------------------------------------------------" << endl << endl;
 }
