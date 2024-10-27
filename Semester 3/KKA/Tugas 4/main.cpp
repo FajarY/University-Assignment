@@ -57,7 +57,7 @@ class sudoku
     }
     int getFitness()
     {
-        return fitness - penalty;
+        return fitness;
     }
 };
 
@@ -589,7 +589,7 @@ void copyTo(vector<int>& from, vector<int>& to)
         to[i] = from[i];
     }
 }
-void genetic(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t maximumIterations, int halfCount, int randomChangeAmountStart, double mutationProbability, int mutationRandomChange, double tournamentWinChance)
+void genetic(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t maximumIterations, int halfCount, int randomChangeAmountStart, double mutationProbability, int mutationRandomChange, double tournamentWinChance, int plateuRestart)
 {
     cout << "Genetic is running" << endl;
     if(halfCount % 2 != 0 || halfCount < 2)
@@ -609,22 +609,7 @@ void genetic(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t maxi
         int randomAmount = random(1, randomChangeAmountStart);
         vector<vector<int>> sampleInput = input;
 
-        for(int j = 0; j < randomAmount; j++)
-        {
-            int index = random(0, input.size() - 1);
-
-            if(input[index].size() == 0)
-            {
-                continue;
-            }
-
-            int left = random(0, input[index].size() - 1);
-            int right = random(0, input[index].size() - 1);
-
-            int temp = sampleInput[index][left];
-            sampleInput[index][left] = sampleInput[index][right];
-            sampleInput[index][right] = temp;
-        }
+        randomize(sampleInput, randomAmount);
 
         grid.read(start, sampleInput, indexer);
         clear(indexer);
@@ -639,25 +624,49 @@ void genetic(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t maxi
     int greatestFitness = INT_MIN;
     vector<vector<int>> greatestInput;
     int currentTournamentIndex = 0;
+    int plateuCount = 0;
 
     while(maximum > 0)
     {
         maximum--;
         count++;
         currentTournamentIndex = 0;
+        plateuCount++;
 
-        for(int i = 0; i < population.size(); i++)
+        if(plateuCount > plateuRestart)
         {
-            if(greatestFitness < population[i].first)
+            plateuCount = 0;
+            int bestFitness = INT_MIN;
+            for(int i = 0; i < population.size(); i++)
             {
-                greatestFitness = population[i].first;
-                greatestInput = population[i].second;
-                cout << "Fitness : " << greatestFitness << " , Gen : " << count << endl;
+                vector<vector<int>>& current = population[i].second;
+                randomize(current, random(1, randomChangeAmountStart));
+
+                grid.read(start, current, indexer);
+                clear(indexer);
+
+                population[i].first = grid.getFitness();
+
+                if(grid.getFitness() > bestFitness)
+                {
+                    bestFitness = grid.getFitness();
+                    
+                    if(bestFitness > greatestFitness)
+                    {
+                        greatestFitness = bestFitness;
+                        greatestInput = current;
+
+                        if(greatestFitness == grid.getFullFitness())
+                        {
+                            goto done;
+                        }
+                    }
+
+                    greatestFitness = bestFitness;
+                    greatestInput = current;
+                }
             }
-            if(population[i].first == grid.getFullFitness())
-            {
-                goto done;
-            }
+            cout << "Plateud : " << bestFitness << endl;
         }
 
         //Tornament
@@ -738,14 +747,30 @@ void genetic(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t maxi
             grid.read(start, rightChild.second, indexer);
             clear(indexer);
             rightChild.first = grid.getFitness();
+
+            if(leftChild.first > greatestFitness)
+            {
+                greatestFitness = leftChild.first;
+                greatestInput = leftChild.second;
+                cout << "Fitness : " << greatestFitness << " , Gen : " << count << endl;
+            }
+            if(rightChild.first > greatestFitness)
+            {
+                greatestFitness = rightChild.first;
+                greatestInput = rightChild.second;
+                cout << "Fitness : " << greatestFitness << " , Gen : " << count << endl;
+            }
         }
 
-        sort(population.begin(), population.end(), comparer);
+        if(greatestFitness == grid.getFullFitness())
+        {
+            break;
+        }
     }
 
     done:
     cout << "Finished in : " << count << " iterations" << endl << endl;
-    grid.read(start, population[0].second, indexer);
+    grid.read(start, greatestInput, indexer);
     clear(indexer);
     grid.print();
 }
@@ -815,6 +840,7 @@ int main()
     sudoku9x9 grid9x9 = sudoku9x9();
     vector<int> start9x9 = parseAs9x9Start("9x9.txt");
 
+    /*
     cout << "4x4 Grid" << endl;
     auto startHill4x4 = getCurrentTime();
     hillClimb(grid4x4, start4x4, 4, UINT_MAX, 5);
@@ -841,13 +867,14 @@ int main()
 
     cout << "4x4 Grid" << endl;
     auto startGen4x4 = getCurrentTime();
-    genetic(grid4x4, start4x4, 4, UINT_MAX, 20, 32, 0.1, 5, 0.25);
+    genetic(grid4x4, start4x4, 4, UINT_MAX, 20, 32, 0.1, 5, 0.25, 100000);
     cout << "Frame time : " << calculateMS(startGen4x4, getCurrentTime()) << endl << endl;
     cout << "-------------------------------------------------" << endl << endl;
+    */
 
     cout << "9x9 Grid" << endl;
     auto startGen9x9 = getCurrentTime();
-    genetic(grid9x9, start9x9, 9, UINT_MAX, 100, 2000, 0.1, 20, 0.5);
+    genetic(grid9x9, start9x9, 9, UINT_MAX, 100, 2000, 0.1, 81, 0.25, 100000);
     cout << "Frame time : " << calculateMS(startGen9x9, getCurrentTime()) << endl << endl;
     cout << "-------------------------------------------------" << endl << endl;
 }
