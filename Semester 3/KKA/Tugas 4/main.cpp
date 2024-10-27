@@ -16,7 +16,7 @@ class sudoku
 
     public:
     const int FOURBYFOUR = 0;
-    const int THREEBYTHREE = 1;
+    const int NINEBYNINE = 1;
 
     bool set(int x, int y, int value)
     {
@@ -34,6 +34,7 @@ class sudoku
 
         penalty++;
         grid[y][x] = value;
+        set_contains(x, y, value);
         return false;
     }
     virtual bool contains(int x, int y, int value) = 0;
@@ -42,8 +43,8 @@ class sudoku
         return grid[y][x];
     }
     virtual void print() = 0;
-    virtual int calculateInputCount(vector<int>& start) = 0;
-    virtual void read(vector<int>& start, vector<int>& input) = 0;
+    virtual vector<vector<int>> calculateInputCount(vector<int>& start) = 0;
+    virtual void read(vector<int>& start, vector<vector<int>>& input, vector<int>& indexer) = 0;
     virtual void clear() = 0;
     virtual int getFullFitness() = 0;
     int get_type()
@@ -83,7 +84,7 @@ class sudoku4x4 : public sudoku
         grid = vector<vector<int>>(4, vector<int>(4, 0));
         gridSet = vector<uint32_t>(4, 0);
         subgridSet = vector<uint32_t>(4, 0);
-        type = sudoku::THREEBYTHREE;
+        type = sudoku::FOURBYFOUR;
     }
     int getFullFitness()
     {
@@ -142,7 +143,7 @@ class sudoku4x4 : public sudoku
         cout << "Fitness : " << fitness << endl;
         cout << "Penalty : " << penalty << endl;
     }
-    int calculateInputCount(vector<int>& start)
+    vector<vector<int>> calculateInputCount(vector<int>& start)
     {
         clear();
 
@@ -152,21 +153,41 @@ class sudoku4x4 : public sudoku
             int x = i % 4;
             int y = i / 4;
 
-            if(start[i] == 0)
-            {
-                inputIndex++;
-            }
-            else
+            if(start[i] != 0)
             {
                 set(x, y, start[i]);
             }
         }
 
+        vector<vector<int>> buckets = vector<vector<int>>(4, vector<int>());
+        for(int y = 0; y < 4; y++)
+        {
+            for(int x = 0; x < 4; x++)
+            {
+                if(get(x, y) == 0)
+                {
+                    int subgridIndex = get_subgrid_index(x, y);
+                    uint32_t subgrid = subgridSet[subgridIndex];
+
+                    for(int i = 1; i <= 4; i++)
+                    {
+                        uint32_t val = (subgrid & (1 << (i - 1)));
+                        if(!val)
+                        {
+                            set(x, y, i);
+                            buckets[subgridIndex].push_back(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         clear();
 
-        return inputIndex;
+        return buckets;
     }
-    void read(vector<int>& start, vector<int>& input)
+    void read(vector<int>& start, vector<vector<int>>& input, vector<int>& indexer)
     {
         clear();
 
@@ -178,7 +199,10 @@ class sudoku4x4 : public sudoku
 
             if(start[i] == 0)
             {
-                set(x, y, input[inputIndex]);
+                int subgridIndex = get_subgrid_index(x, y);
+                set(x, y, input[subgridIndex][indexer[subgridIndex]]);
+                indexer[subgridIndex] += 1;
+                
                 inputIndex++;
             }
             else
@@ -228,7 +252,7 @@ class sudoku9x9 : public sudoku
         grid = vector<vector<int>>(9, vector<int>(9, 0));
         gridSet = vector<uint32_t>(9, 0);
         subgridSet = vector<uint32_t>(9, 0);
-        type = sudoku::THREEBYTHREE;
+        type = sudoku::NINEBYNINE;
     }
     int getFullFitness()
     {
@@ -287,7 +311,7 @@ class sudoku9x9 : public sudoku
         cout << "Fitness : " << fitness << endl;
         cout << "Penalty : " << penalty << endl;
     }
-    int calculateInputCount(vector<int>& start)
+    vector<vector<int>> calculateInputCount(vector<int>& start)
     {
         clear();
 
@@ -297,21 +321,40 @@ class sudoku9x9 : public sudoku
             int x = i % 9;
             int y = i / 9;
 
-            if(start[i] == 0)
-            {
-                inputIndex++;
-            }
-            else
+            if(start[i] != 0)
             {
                 set(x, y, start[i]);
             }
         }
 
+        vector<vector<int>> buckets = vector<vector<int>>(9, vector<int>());
+        for(int y = 0; y < 9; y++)
+        {
+            for(int x = 0; x < 9; x++)
+            {
+                if(get(x, y) == 0)
+                {
+                    int subgridIndex = get_subgrid_index(x, y);
+                    uint32_t subgrid = subgridSet[subgridIndex];
+
+                    for(int i = 1; i <= 9; i++)
+                    {
+                        if(!(subgrid & (1 << (i - 1))))
+                        {
+                            set(x, y, i);
+                            buckets[subgridIndex].push_back(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         clear();
 
-        return inputIndex;
+        return buckets;
     }
-    void read(vector<int>& start, vector<int>& input)
+    void read(vector<int>& start, vector<vector<int>>& input, vector<int>& indexer)
     {
         clear();
 
@@ -323,7 +366,10 @@ class sudoku9x9 : public sudoku
 
             if(start[i] == 0)
             {
-                set(x, y, input[inputIndex]);
+                int subgridIndex = get_subgrid_index(x, y);
+                set(x, y, input[subgridIndex][indexer[subgridIndex]]);
+                indexer[subgridIndex] += 1;
+
                 inputIndex++;
             }
             else
@@ -366,50 +412,180 @@ int random(int min, int max)
 {
     return min + rand() % (max - min + 1);
 }
+double randomDouble(double min, double max)
+{
+    return min + (double)(rand()) / (double)RAND_MAX * (max - min);
+}
+
+//To allow debugging, uncomment the line bellow
+//#define DEBUG
 
 //Hill Climbing
 void hillClimb(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t maximumIterations, int randomChangeAmount)
 {
     cout << "Hill climbing is running" << endl;
-    vector<int> input = vector<int>(grid.calculateInputCount(start), 0);
-
-    for(int i = 0; i < input.size(); i++)
-    {
-        //Initial State
-        input[i] = random(1, sudokuMaxValue);
-    }
+    vector<vector<int>> input = grid.calculateInputCount(start);
+    vector<int> indexer = vector<int>(input.size(), 0);
 
     uint64_t maximum = maximumIterations;
     uint64_t count = 0;
+
     while(maximum > 0)
     {
         maximum--;
         count++;
 
-        grid.read(start, input);
+        grid.read(start, input, indexer);
+        clear(indexer);
         int currentFitness = grid.getFitness();
         if(currentFitness == grid.getFullFitness())
         {
             break;
         }
 
-        vector<int> neighbour = input;
+        vector<vector<int>> neighbour = input;
         int randomAmount = random(1, randomChangeAmount);
         for(int j = 0; j < randomAmount; j++)
         {
             int index = random(0, input.size() - 1);
-            neighbour[index] = random(1, sudokuMaxValue);
+
+            if(input[index].size() == 0)
+            {
+                continue;
+            }
+
+            int left = random(0, input[index].size() - 1);
+            int right = random(0, input[index].size() - 1);
+
+            int temp = neighbour[index][left];
+            neighbour[index][left] = neighbour[index][right];
+            neighbour[index][right] = temp;
         }
 
-        grid.read(start, neighbour);
+        grid.read(start, neighbour, indexer);
+        clear(indexer);
         int neighbourFitness = grid.getFitness();
 
         if(neighbourFitness > currentFitness)
         {
             cout << "Fitness : " << neighbourFitness << endl;
-            currentFitness = neighbourFitness;
+            
             input = neighbour;
         }
+    }
+
+    cout << "Finished in : " << count << " iterations" << endl << endl;
+    grid.print();
+}
+
+//Simulated Annealing
+void simulatedAnnealing(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t maximumIterations, int randomChangeAmount, double coolingMultiplier)
+{
+    cout << "Simulated annealing is running" << endl;
+    vector<vector<int>> input = grid.calculateInputCount(start);
+    vector<int> indexer = vector<int>(input.size(), 0);
+
+    uint64_t maximum = maximumIterations;
+    uint64_t count = 0;
+
+    //Temperature
+    double temperature = 0.0;
+    double sumTemperature = 0.0;
+    vector<double> temperatureCheck = vector<double>(200);
+    vector<vector<int>> temperatureInput = input;
+    for(int i = 0; i < temperatureCheck.size(); i++)
+    {
+        int randomAmount = random(1, randomChangeAmount);
+        for(int j = 0; j < randomAmount; j++)
+        {
+            int index = random(0, input.size() - 1);
+
+            if(input[index].size() == 0)
+            {
+                continue;
+            }
+
+            int left = random(0, input[index].size() - 1);
+            int right = random(0, input[index].size() - 1);
+
+            int temp = temperatureInput[index][left];
+            temperatureInput[index][left] = temperatureInput[index][right];
+            temperatureInput[index][right] = temp;
+        }
+
+        grid.read(start, temperatureInput, indexer);
+        clear(indexer);
+
+        temperatureCheck[i] = (double)grid.getFitness();
+        sumTemperature += (double)grid.getFitness();
+    }
+    double mean = sumTemperature / (double)temperatureCheck.size();
+    double squareTemperatureSum = 0.0;
+    for(int i = 0; i < temperatureCheck.size(); i++)
+    {
+        squareTemperatureSum += ((temperatureCheck[i] - mean) * (temperatureCheck[i] - mean));
+    }
+    temperature = sqrt(squareTemperatureSum / (double)temperatureCheck.size());
+
+    cout << "Start Temperature : " << temperature << endl;
+
+    //Algorithm
+    while(maximum > 0)
+    {
+        maximum--;
+        count++;
+
+        grid.read(start, input, indexer);
+        clear(indexer);
+        int currentFitness = grid.getFitness();
+        if(currentFitness == grid.getFullFitness())
+        {
+            break;
+        }
+
+        vector<vector<int>> neighbour = input;
+        int randomAmount = random(1, randomChangeAmount);
+        for(int j = 0; j < randomAmount; j++)
+        {
+            int index = random(0, input.size() - 1);
+
+            if(input[index].size() == 0)
+            {
+                continue;
+            }
+
+            int left = random(0, input[index].size() - 1);
+            int right = random(0, input[index].size() - 1);
+
+            int temp = neighbour[index][left];
+            neighbour[index][left] = neighbour[index][right];
+            neighbour[index][right] = temp;
+        }
+
+        grid.read(start, neighbour, indexer);
+        clear(indexer);
+        int neighbourFitness = grid.getFitness();
+
+        if(neighbourFitness > currentFitness)
+        {
+            cout << "Fitness : " << neighbourFitness << " , Temperature : " << temperature << endl;
+            input = neighbour;
+        }
+        else
+        {
+            
+            double acceptanceProbability = exp((double)(neighbourFitness - currentFitness) / temperature);
+            double diced = randomDouble(0.0, 1.0);
+            if(diced < acceptanceProbability)
+            {
+                #ifdef DEBUG
+                cout << "(Accepted) Fitness : " << neighbourFitness << " , Temperature : " << temperature << " , Prob : " << acceptanceProbability << " , Diced : " << diced << endl;
+                #endif
+                input = neighbour;
+            }
+        }
+
+        temperature *= coolingMultiplier;
     }
 
     cout << "Finished in : " << count << " iterations" << endl << endl;
@@ -481,11 +657,27 @@ int main()
     sudoku9x9 grid9x9 = sudoku9x9();
     vector<int> start9x9 = parseAs9x9Start("9x9.txt");
 
+    cout << "4x4 Grid" << endl;
     auto startHill4x4 = getCurrentTime();
-    hillClimb(grid4x4, start4x4, 4, ULONG_MAX, 5);
+    hillClimb(grid4x4, start4x4, 4, UINT_MAX, 5);
     cout << "Frame time : " << calculateMS(startHill4x4, getCurrentTime()) << endl << endl;
+    cout << "-------------------------------------------------" << endl << endl;
 
+    cout << "9x9 Grid (Capped 1000000)" << endl;
     auto startHill9x9 = getCurrentTime();
-    hillClimb(grid9x9, start9x9, 9, ULONG_MAX, 64);
+    hillClimb(grid9x9, start9x9, 9, 1000000, 20);
     cout << "Frame time : " << calculateMS(startHill9x9, getCurrentTime()) << endl << endl;
+    cout << "-------------------------------------------------" << endl << endl;
+
+    cout << "4x4 Grid" << endl;
+    auto startSim4x4 = getCurrentTime();
+    simulatedAnnealing(grid4x4, start4x4, 4, UINT_MAX, 5, 0.99);
+    cout << "Frame time : " << calculateMS(startSim4x4, getCurrentTime()) << endl << endl;
+    cout << "-------------------------------------------------" << endl << endl;
+
+    cout << "9x9 Grid" << endl;
+    auto startSim9x9 = getCurrentTime();
+    simulatedAnnealing(grid9x9, start9x9, 9, UINT_MAX, 20, 0.99);
+    cout << "Frame time : " << calculateMS(startSim9x9, getCurrentTime()) << endl << endl;
+    cout << "-------------------------------------------------" << endl << endl;
 }
