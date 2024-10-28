@@ -840,7 +840,6 @@ int main()
     sudoku9x9 grid9x9 = sudoku9x9();
     vector<int> start9x9 = parseAs9x9Start("9x9.txt");
 
-    /*
     cout << "4x4 Grid" << endl;
     auto startHill4x4 = getCurrentTime();
     hillClimb(grid4x4, start4x4, 4, UINT_MAX, 5);
@@ -870,7 +869,6 @@ int main()
     genetic(grid4x4, start4x4, 4, UINT_MAX, 20, 32, 0.1, 5, 0.25, 100000);
     cout << "Frame time : " << calculateMS(startGen4x4, getCurrentTime()) << endl << endl;
     cout << "-------------------------------------------------" << endl << endl;
-    */
 
     cout << "9x9 Grid" << endl;
     auto startGen9x9 = getCurrentTime();

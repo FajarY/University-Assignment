@@ -68,7 +68,7 @@ public class Game {
         {
             printHelp();
         }
-        else if(command.getCommandWord().equals("exit"))
+        else if(command.getCommandWord().equals("quit"))
         {
             isPlaying = false;
         }
@@ -89,11 +89,11 @@ public class Game {
         {
             goToRoomNow(currentRoom.getNorthExit(), command.getSecondWord());
         }
-        else if(command.getCommandWord().equals("east"))
+        else if(command.getSecondWord().equals("east"))
         {
             goToRoomNow(currentRoom.getEastExit(), command.getSecondWord());
         }
-        else if(command.getCommandWord().equals("south"))
+        else if(command.getSecondWord().equals("south"))
         {
             goToRoomNow(currentRoom.getSouthExit(), command.getSecondWord());
         }
