@@ -480,6 +480,8 @@ void hillClimb(sudoku& grid, vector<int>& start, int sudokuMaxValue, uint64_t ma
     }
 
     cout << "Finished in : " << count << " iterations" << endl << endl;
+    grid.read(start, input, indexer);
+    clear(indexer);
     grid.print();
 }
 
@@ -564,6 +566,8 @@ void simulatedAnnealing(sudoku& grid, vector<int>& start, int sudokuMaxValue, ui
     }
 
     cout << "Finished in : " << count << " iterations" << endl << endl;
+    grid.read(start, input, indexer);
+    clear(indexer);
     grid.print();
 }
 
@@ -872,7 +876,7 @@ int main()
 
     cout << "9x9 Grid" << endl;
     auto startGen9x9 = getCurrentTime();
-    genetic(grid9x9, start9x9, 9, UINT_MAX, 100, 2000, 0.1, 81, 0.25, 100000);
+    genetic(grid9x9, start9x9, 9, UINT_MAX, 100, 2000, 0.1, 20, 0.25, 100000);
     cout << "Frame time : " << calculateMS(startGen9x9, getCurrentTime()) << endl << endl;
     cout << "-------------------------------------------------" << endl << endl;
 }
