@@ -1,0 +1,156 @@
+@startuml
+
+'------------------
+' Kelas Post
+'------------------
+
+abstract class Post {
+    - UUID id
+    - UUID author
+    - Network network
+    - HashSet<UUID> userLikesReference
+    - HashSet<UUID> userDislikesReference
+    - HashSet<UUID> commentsReference
+    - LocalDateTime created
+
+    + Post(Network, UUID, UUID)
+    + UUID getId()
+    + UUID getAuthor()
+    + int getLikesCount()
+    + int getDislikesCount()
+    + void like(UUID)
+    + void dislike(UUID)
+    + void addCommentReference(UUID, UUID)
+    + void addLikeReference(UUID, UUID)
+    + void addDislikeReference(UUID, UUID)
+    + abstract String getDisplay(int)
+    # Iterator<UUID> getComments()
+    # String getCommentDisplay(int)
+    # static String getTabs(int)
+}
+
+'------------------
+' Kelas Turunan Post
+'------------------
+
+class PhotoPost extends Post {
+    - String caption
+    - String photo
+
+    + setCaption(String)
+    + setPhoto(String)
+    + String getDisplay(int)
+}
+
+class MessagePost extends Post {
+    - String caption
+    - String message
+
+    + setCaption(String)
+    + setMessage(String)
+    + String getDisplay(int)
+}
+
+class CommentPost extends Post {
+    - String comment
+
+    + setComment(String)
+    + String getDisplay(int)
+}
+
+'------------------
+' Kelas PostFactory
+'------------------
+
+abstract class PostFactory<T> {
+    + T create(Network, UUID, UUID)
+}
+
+class MessagePostFactory {
+    + MessagePost create(Network, UUID, UUID)
+}
+
+class PhotoPostFactory {
+    + PhotoPost create(Network, UUID, UUID)
+}
+
+'------------------
+' Kelas User
+'------------------
+
+class User {
+    - Network network
+    - String username
+    - UUID id
+    - HashSet<UUID> postReference
+    - HashSet<UUID> commentReference
+    - HashSet<UUID> followersReference
+
+    + User()
+    + set(Network, UUID, String)
+    + String getUsername()
+    + UUID getId()
+    + int getFollowersCount()
+    + void addPostReference(UUID)
+    + void addCommentReference(UUID)
+    + void follow(UUID)
+    + void unfollow(UUID)
+    + void addFollowReference(UUID, UUID)
+    + void unfollowReference(UUID, UUID)
+}
+
+'------------------
+' Kelas Network
+'------------------
+
+class Network {
+    - UUID secretKey
+    - HashMap<UUID, Post> postDatabase
+    - HashMap<UUID, User> userDatabase
+    - HashMap<Class, PostFactory> factory
+
+    + Network()
+    + void like(UUID, UUID)
+    + void dislike(UUID, UUID)
+    + UUID createUser(String)
+    + String getUsername(UUID)
+    + String getDisplay(UUID, int)
+    + String getAllDisplay()
+    + <T extends Post> T createPost(Class<T>, UUID)
+    + CommentPost createComment(UUID, UUID)
+    + void follow(UUID, UUID)
+    + void unfollow(UUID, UUID)
+    + int getFollowers(UUID)
+    + boolean isValidSecret(UUID)
+}
+
+'------------------
+' Kelas Main
+'------------------
+
+class Main {
+    + static void main(String[])
+    + static CommentPost Comment(Network, Post, UUID, String)
+}
+
+'------------------
+' Relasi antar Kelas
+'------------------
+
+PostFactory <|-- MessagePostFactory
+PostFactory <|-- PhotoPostFactory
+
+Network --> Post : manages
+Network --> User : manages
+Network --> PostFactory : uses
+
+User --> Post : references
+Post <|-- PhotoPost
+Post <|-- MessagePost
+Post <|-- CommentPost
+
+Main --> Network : uses
+Main --> Post : creates instances
+Main --> CommentPost : creates instances
+
+@enduml
