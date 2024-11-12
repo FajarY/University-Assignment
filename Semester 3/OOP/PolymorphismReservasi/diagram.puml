@@ -1,0 +1,48 @@
+@startuml
+
+package java.util {
+  class ArrayList
+}
+
+class Ticket {
+    - baseFarePrice : float = 100
+    # bagageLimit : int = 2
+    # otherFacilities : List<String> = new ArrayList<>()
+    # destination : String
+
+    Ticket(String destination)
+    + calculateFare() : float
+    + getInformation() : String
+    # getHeader() : String
+    + static makeHeader(header : String) : String
+}
+
+abstract Ticket
+
+class EconomyTicket {
+    + EconomyTicket(destination : String)
+    + calculateFare() : float
+    + getHeader() : String
+}
+
+class BusinessTicket {
+    + BusinessTicket(destination : String)
+    + calculateFare() : float
+    + getHeader() : String
+}
+
+class FirstClassTicket {
+    + FirstClassTicket(destination : String)
+    + calculateFare() : float
+    + getHeader() : String
+}
+
+Ticket <|-- EconomyTicket
+Ticket <|-- BusinessTicket
+Ticket <|-- FirstClassTicket
+
+Main --> EconomyTicket : uses
+Main --> BusinessTicket : uses
+Main --> FirstClassTicket : uses
+
+@enduml
