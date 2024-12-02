@@ -1,0 +1,57 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Main {
+    - JTextField txtUsername
+    - JPasswordField txtPassword
+    - static String Username = "Fajar"
+    - static String Password = "its"
+    - static String msg
+    + void main(String[] args)
+    + void go()
+}
+
+class LoginListener {
+    + void actionPerformed(ActionEvent event)
+}
+
+class CancelListener {
+    + void actionPerformed(ActionEvent event)
+}
+
+Main o-- LoginListener
+Main o-- CancelListener
+
+' Swing and AWT dependencies
+package javax.swing {
+    class JFrame
+    class JPanel
+    class JLabel
+    class JTextField
+    class JPasswordField
+    class JButton
+    class JOptionPane
+}
+
+package java.awt {
+    class GridLayout
+    class BorderLayout
+}
+
+package java.awt.event {
+    class ActionListener
+    class ActionEvent
+}
+
+Main --> "JFrame" : creates
+Main --> "JPanel" : uses
+Main --> "JLabel" : uses
+Main --> "JTextField" : uses
+Main --> "JPasswordField" : uses
+Main --> "JButton" : uses
+Main --> "JOptionPane" : uses
+
+LoginListener --> "ActionListener" : implements
+CancelListener --> "ActionListener" : implements
+
+@enduml

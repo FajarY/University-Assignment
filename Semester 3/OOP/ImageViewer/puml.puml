@@ -1,0 +1,64 @@
+@startuml
+class Main {
+    + main(String[] args)
+}
+
+class ImageViewer {
+    - static String VERSION
+    - static JFileChooser fileChooser
+    - JFrame frame
+    - ImagePanel imagePanel
+    - JLabel filenameLabel
+    - JLabel statusLabel
+    - OFImage currentImage
+
+    + ImageViewer()
+    - openFile()
+    - close()
+    - quit()
+    - makeDarker()
+    - makeLighter()
+    - threshold()
+    - showAbout()
+    - showFilename(String filename)
+    - showStatus(String text)
+    - makeFrame()
+    - makeMenuBar(JFrame frame)
+}
+
+class ImagePanel {
+    - int width
+    - int height
+    - OFImage panelImage
+
+    + ImagePanel()
+    + setImage(OFImage image)
+    + clearImage()
+    + getPreferredSize() : Dimension
+    + paintComponent(Graphics g)
+}
+
+class ImageFileManager {
+    - static final String IMAGE_FORMAT
+    + static loadImage(File imageFile) : OFImage
+    + static saveImage(OFImage image, File file)
+}
+
+class OFImage extends BufferedImage {
+    + OFImage(BufferedImage image)
+    + OFImage(int width, int height)
+    + setPixel(int x, int y, Color col)
+    + getPixel(int x, int y) : Color
+    + darker()
+    + lighter()
+    + threshold()
+}
+
+Main --> ImageViewer
+ImageViewer *-- ImagePanel
+ImageViewer *-- ImageFileManager
+ImageViewer *-- OFImage
+ImagePanel *-- OFImage
+ImageFileManager *-- OFImage
+OFImage <|-- BufferedImage
+@enduml
