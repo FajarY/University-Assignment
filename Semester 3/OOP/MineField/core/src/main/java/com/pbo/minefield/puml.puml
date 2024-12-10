@@ -1,0 +1,149 @@
+@startuml
+package com.pbo.minefield {
+    class Main {
+        - SpriteBatch batch
+        - FitViewport viewport
+        - OrthographicCamera camera
+        - static Main singleton
+        - Game game
+        - InputProcessor inputProcessor
+        - static boolean isTouchDown
+        - static boolean isTouch
+        - static boolean isTouchUp
+        - static boolean isRightTouchDown
+        + create(): void
+        + render(): void
+        + resize(int, int): void
+        + dispose(): void
+        + pause(): void
+        + resume(): void
+        + static getCamera(): Camera
+        + static getFitViewport(): FitViewport
+    }
+
+    class GameObject {
+        # Game game
+        + boolean destroyed
+        + awake(): void
+        + start(): void
+        + update(): void
+        + draw(SpriteBatch): void
+        + destroy(): void
+    }
+
+    class Game {
+        + static float drawScale
+        + static final float randomScale
+        - Cell[][] cells
+        - int width
+        - int height
+        - float size
+        - int cellCount
+        - HashSet<Cell> startCells
+        - Vector3 mousePosition
+        - Vector2Int mouseCellPosition
+        - boolean[][] flagged
+        - static final int IDLE_STATE
+        - static final int WIN_STATE
+        - static final int LOSE_STATE
+        - boolean active
+        - int state
+        - float timer
+        - float freezeTimer
+        - Random random
+        + resetDefault(): void
+        + reset(int, float, float, float): void
+        + update(): void
+        + preDraw(Camera): void
+        + draw(SpriteBatch, Camera): void
+        + withinBounds(int, int): boolean
+        + getCellAt(int, int): Cell
+        + destroyCell(int, int): void
+        + createCell(Cell, int, int): Cell
+        + calculateDrawPosition(float): float
+        + calculateDrawSize(float): float
+        + getPointerCellPosition(): Vector2Int
+        + getState(): int
+        + getRandom(): Random
+        + setLose(): void
+    }
+
+    class Assets {
+        - static TextureRegion explodeTexture
+        - static TextureRegion mineTexture
+        - static TextureRegion notChoosedCellTexture
+        - static TextureRegion[] choosedCellTextures
+        - static TextureRegion[] fontTextures
+        - static TextureRegion defuserTexture
+        - static TextureRegion mineDefusedTexture
+        - static TextureRegion choosingTexture
+        - static TextureRegion whiteTexture
+        - static TextureRegion flagTexture
+        - static Texture winTexture
+        - static Texture loseTexture
+        - static TextureRegion[] retryButtonTexture
+        + load(): void
+        + getExplodeTexture(): TextureRegion
+        + getMineTexture(): TextureRegion
+        + getNotChoosedCellTexture(): TextureRegion
+        + getChoosedCellTextures(int): TextureRegion
+        + getFontTextures(int): TextureRegion
+        + getDefuserTexture(): TextureRegion
+        + getMineDefusedTexture(): TextureRegion
+        + getChoosingTexture(): TextureRegion
+        + getWhiteTexture(): TextureRegion
+        + getFlagTexture(): TextureRegion
+        + getWinTexture(): Texture
+        + getLoseTexture(): Texture
+        + getRetryTexture(int): TextureRegion
+    }
+
+    class Vector2Int {
+        + int x
+        + int y
+        + Vector2Int()
+        + Vector2Int(int, int)
+    }
+
+    Main --> Game
+    Game --> Cell
+    Game --> Vector2Int
+    Game --> Assets
+    Cell <|-- Mine
+    Cell <|-- Defuser
+    GameObject <|-- Cell
+}
+
+package com.pbo.minefield.gameobjects {
+    class Cell {
+        + int x
+        + int y
+        # boolean isMouseChoosed
+        # boolean choosed
+        # boolean zombie
+        + awake(): void
+        + start(): void
+        + update(): void
+        + draw(SpriteBatch): void
+        + getDefaultCellTexture(): TextureRegion
+        + setZombie(boolean): void
+        + onZombieCallback(boolean): void
+        + setChoosed(): void
+        + isChoosed(): boolean
+    }
+
+    class Mine {
+        + boolean defused
+        + update(): void
+        + draw(SpriteBatch): void
+        + onChoosedCallback(): void
+    }
+
+    class Defuser {
+        + update(): void
+        + draw(SpriteBatch): void
+        + onChoosedCallback(): void
+    }
+}
+
+@enduml
